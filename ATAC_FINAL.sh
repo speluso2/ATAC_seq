@@ -1,5 +1,5 @@
 #!/bin/sh
-#$ -N TOBIA
+#$ -N ATAC
 #$ -cwd
 #$ -l h_rt=48:00:00
 #$ -l h_vmem=30G
@@ -18,7 +18,7 @@ module load igmm/apps/picard/1.139
 
 cutadapt -a CTGTCTCTTATACACATCTCCGAGCCCACGAGACGGACTCCTATCTCGT  -A CTGTCTCTTATACACATCTGACGCTGCCGACGAGTGTAGATCTCGGTGGT -o trimmed_ESCplusRA48hrP23_forward.fastq -p trimmed_ESCplusRA48hrP23_reverse.fastq  201230_X591_FCHF2YLCCX2_L3_ESCplusRA48hrP23_1.fq 201230_X591_FCHF2YLCCX2_L3_ESCplusRA48hrP23_2.fq
 
-bowtie2 -p 8 -x /exports/igmm/eddie/NextGenResources/reference/mm9/Mus_musculus/UCSC/mm9/Sequence/Bowtie2Index/genome -1 trimmed_ESCplusRA48hrP23_forward.fastq -2 trimmed_ESCplusRA48hrP23_reverse.fastq -S ESCplusRA48hrP23_paired_align.sam
+bowtie2 -p 8 -x mm9/genome -1 trimmed_ESCplusRA48hrP23_forward.fastq -2 trimmed_ESCplusRA48hrP23_reverse.fastq -S ESCplusRA48hrP23_paired_align.sam
 
 
 awk '$3!="chrM" && $3!="*" {print}' ESCplusRA48hrP23_paired_align.sam > ESCplusRA48hrP23_subMitoUnc.sam
@@ -45,8 +45,3 @@ LC_COLLATE=C sort -k1,1 -k2,2n rESCplusRA48hrP23_final.bedGraph > rESCplusRA48hr
 
 bedGraphToBigWig rESCplusRA48hrP23_final_sorthed.bedGraph mm9.chr.sizes rESCplusRA48hrP23.bw
 
-bedtools genomecov -ibam ESCRAP29_subMitoUnc_filtered_shift_sorted.bam -bg -split -g mm9 > ESCRAP29_final.bedGraph
-
-LC_COLLATE=C sort -k1,1 -k2,2n ESCRAP29_final.bedGraph > ESCRAP29_final_sorthed.bedGraph
-
-bedGraphToBigWig ESCRAP29_final_sorthed.bedGraph ../../ESCplusRA48hrP23/mm9.chr.sizes ESCRAP29.bw
